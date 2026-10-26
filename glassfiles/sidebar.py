@@ -58,6 +58,7 @@ class Sidebar(Gtk.Box):
         row.gf_file = gfile
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
         top = Gtk.Box(spacing=10)
+        top.append(Gtk.Box(css_classes=["gf-indicator"], valign=Gtk.Align.CENTER))  # lit when selected
         img = Gtk.Image(icon_name=icon) if isinstance(icon, str) else Gtk.Image(gicon=icon)
         top.append(img)
         top.append(Gtk.Label(label=title, xalign=0, hexpand=True, ellipsize=Pango.EllipsizeMode.END))

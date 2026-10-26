@@ -40,7 +40,7 @@ class PathBar(Gtk.Stack):
         self.crumbs = Gtk.Box(spacing=0, css_classes=["gf-crumbs"])
         click = Gtk.GestureClick()
         click.connect("released", lambda g, n, x, y: self.edit() if self.crumbs.pick(x, y, 0) in (self.crumbs, self.filler) else None)
-        self.crumbs_wrap = Gtk.Box(hexpand=True)
+        self.crumbs_wrap = Gtk.Box(hexpand=True, css_classes=["gf-crumbs-wrap"])
         self.crumbs_wrap.append(self.crumbs)
         self.filler = Gtk.Box(hexpand=True)
         self.crumbs_wrap.append(self.filler)
@@ -214,7 +214,9 @@ class Window(Adw.ApplicationWindow):
         # Row 3: commands, like Windows 11's command bar.
         cmd = Gtk.Box(spacing=2, css_classes=["gf-cmdbar"])
         self.new_menu = Gio.Menu()
-        cmd.append(menu_button("list-add-symbolic", "Yeni", self.new_menu, "Yeni klasör ya da dosya"))
+        new_btn = menu_button("list-add-symbolic", "Yeni", self.new_menu, "Yeni klasör ya da dosya")
+        new_btn.add_css_class("gf-new")
+        cmd.append(new_btn)
         cmd.append(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL, css_classes=["gf-vsep"]))
         for icon, tip, act in [("edit-cut-symbolic", "Kes (Ctrl+X)", "win.cut"),
                                ("edit-copy-symbolic", "Kopyala (Ctrl+C)", "win.copy"),
@@ -239,15 +241,6 @@ class Window(Adw.ApplicationWindow):
         self.details = DetailsPane()
         self.details_revealer = Gtk.Revealer(child=self.details, transition_type=Gtk.RevealerTransitionType.SLIDE_LEFT,
                                              reveal_child=settings.get("details_pane", False))
-        center = Gtk.Box()
-        self.tabs.set_hexpand(True)
-        center.append(self.tabs)
-        center.append(self.details_revealer)
-        self.paned = Gtk.Paned(start_child=self.sidebar, end_child=center, shrink_start_child=False,
-                               resize_start_child=False, position=settings.get("sidebar", 230),
-                               css_classes=["gf-paned"])
-        view.set_content(self.paned)
-
         # Status bar.
         status = Gtk.Box(spacing=12, css_classes=["gf-status"])
         self.status_count = Gtk.Label(xalign=0)
@@ -264,7 +257,20 @@ class Window(Adw.ApplicationWindow):
             b = Gtk.Button(icon_name=icon, tooltip_text=tip, css_classes=["flat", "gf-status-btn"],
                            action_name="win.view", action_target=GLib.Variant("s", mode))
             status.append(b)
-        view.add_bottom_bar(status)
+
+        # Body: sidebar on the window's glass, the folder on a raised rounded surface (as in Windows 11).
+        center = Gtk.Box()
+        self.tabs.set_hexpand(True)
+        center.append(self.tabs)
+        center.append(self.details_revealer)
+        center.set_vexpand(True)
+        surface = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, css_classes=["gf-surface"], overflow=Gtk.Overflow.HIDDEN)
+        surface.append(center)
+        surface.append(status)
+        self.paned = Gtk.Paned(start_child=self.sidebar, end_child=surface, shrink_start_child=False,
+                               resize_start_child=False, position=settings.get("sidebar", 230),
+                               css_classes=["gf-paned"])
+        view.set_content(self.paned)
 
         self._actions()
         self.browser = None

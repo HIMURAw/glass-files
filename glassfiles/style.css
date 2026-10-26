@@ -1,23 +1,28 @@
-/* Glass Files — Mor palette (Dynamic Island's violet glass), softer corners than the system theme.
-   Loaded above the user's gtk.css, so the theme's 45° gradient corners are reset here. */
+/* Glass Files — Mor palette (Dynamic Island's violet glass), laid out like Windows 11 Explorer:
+   the chrome (tabs, toolbars, sidebar) sits on the window's dark glass, the folder on a raised,
+   rounded surface. Loaded above the user's gtk.css, so the theme's 45° gradient corners are reset here. */
 
-@define-color gf_base #120f1b;
-@define-color gf_window #161221;
-@define-color gf_bar #1b162c;
-@define-color gf_raised #241e38;
-@define-color gf_hover rgba(255, 255, 255, 0.055);
-@define-color gf_press rgba(255, 255, 255, 0.09);
-@define-color gf_line rgba(168, 132, 255, 0.13);
+@define-color gf_glass #120e1c;
+@define-color gf_chrome #1a1529;
+@define-color gf_surface #1f1a2f;
+@define-color gf_surface_hi #262038;
+@define-color gf_field rgba(255, 255, 255, 0.05);
+@define-color gf_hover rgba(255, 255, 255, 0.06);
+@define-color gf_press rgba(255, 255, 255, 0.10);
+@define-color gf_line rgba(190, 165, 255, 0.10);
+@define-color gf_line_hi rgba(190, 165, 255, 0.22);
 @define-color gf_accent #8a70ec;
-@define-color gf_accent_soft rgba(138, 112, 236, 0.24);
-@define-color gf_lavender #b39cff;
-@define-color gf_text #eeebf7;
-@define-color gf_dim rgba(238, 235, 247, 0.58);
+@define-color gf_accent_soft rgba(138, 112, 236, 0.22);
+@define-color gf_accent_mid rgba(138, 112, 236, 0.32);
+@define-color gf_lavender #b9a4ff;
+@define-color gf_text #efecf8;
+@define-color gf_dim rgba(239, 236, 248, 0.56);
+@define-color gf_faint rgba(239, 236, 248, 0.34);
 
 /* ---- Reset the theme's chamfer gradients inside this app ---- */
-window.gf-window button, window.gf-window entry, window.gf-window searchbar entry,
-window.gf-window row, window.gf-window popover > contents, window.gf-window .card,
-window.gf-window gridview > child, window.gf-window columnview > listview > row,
+window.gf-window button, window.gf-window entry, window.gf-window text, window.gf-window row,
+window.gf-window popover > contents, window.gf-window gridview > child,
+window.gf-window columnview > listview > row, window.gf-window tab,
 popover.menu > contents, popover > contents {
   background-image: none;
   background-clip: border-box;
@@ -26,129 +31,162 @@ popover.menu > contents, popover > contents {
   box-shadow: none;
 }
 
-window.gf-window { background-color: @gf_window; color: @gf_text; }
+window.gf-window {
+  background-color: @gf_glass;
+  background-image: radial-gradient(circle at 0% 0%, rgba(138, 112, 236, 0.10), transparent 45%);
+  color: @gf_text;
+}
 
-window.gf-window button { border-radius: 8px; border: none; background-color: transparent; min-height: 30px; min-width: 30px; }
+window.gf-window button { border-radius: 8px; border: none; background-color: transparent; min-height: 32px; min-width: 32px; }
 window.gf-window button:hover { background-color: @gf_hover; }
 window.gf-window button:active, window.gf-window button:checked { background-color: @gf_press; }
-window.gf-window button:disabled { opacity: 0.38; }
+window.gf-window button:disabled { opacity: 0.32; }
 
 /* ---- Row 1: tabs ---- */
-.gf-tabstrip { background-color: @gf_base; padding: 6px 6px 0 8px; min-height: 40px; }
+.gf-tabstrip { padding: 8px 8px 0 10px; min-height: 42px; }
 .gf-tabbar, .gf-tabbar > revealer > box { background: none; box-shadow: none; border: none; padding: 0; }
 .gf-tabbar tab {
-  border-radius: 10px 10px 0 0; margin: 0 1px; padding: 0 6px 0 10px; min-height: 34px; min-width: 150px;
-  background-image: none; background-color: transparent; color: @gf_dim; box-shadow: none;
+  border-radius: 10px 10px 0 0; margin: 0 2px 0 0; padding: 0 4px 0 12px; min-height: 36px; min-width: 120px;
+  background-color: transparent; color: @gf_dim; border: none;
+  transition: background-color 120ms, color 120ms;
 }
-.gf-tabbar tab:hover { background-color: rgba(255, 255, 255, 0.04); color: @gf_text; }
-.gf-tabbar tab:selected { background-color: @gf_bar; color: @gf_text; box-shadow: inset 0 2px @gf_lavender; }
-.gf-tabbar tab button.tab-close-button { min-height: 22px; min-width: 22px; border-radius: 6px; padding: 0; }
-.gf-tabbar tabbox > separator, .gf-tabbar tab separator { opacity: 0; }
-.gf-newtab { margin: 4px 6px 4px 4px; min-height: 28px; min-width: 28px; border-radius: 8px; }
-.gf-controls { margin: 0 2px 6px 8px; }
-.gf-controls button { min-height: 28px; min-width: 28px; border-radius: 8px; }
-.gf-controls button.close:hover { background-color: #ff4f6b; color: white; }
+.gf-tabbar tab:hover { background-color: rgba(255, 255, 255, 0.035); color: @gf_text; }
+.gf-tabbar tab:selected { background-color: @gf_chrome; color: @gf_text; }
+.gf-tabbar tab:selected image { color: @gf_lavender; }
+.gf-tabbar tab .tab-close-button { min-height: 24px; min-width: 24px; border-radius: 6px; padding: 0; opacity: 0.55; }
+.gf-tabbar tab .tab-close-button:hover { opacity: 1; background-color: @gf_hover; }
+.gf-tabbar tabbox > separator, .gf-tabbar tab separator, .gf-tabbar separator { opacity: 0; min-width: 0; }
+.gf-tabbar .start-action, .gf-tabbar .end-action { padding: 0; border: none; }
+button.gf-newtab {
+  margin: 0 0 4px 4px; min-height: 30px; min-width: 30px; padding: 0; border-radius: 8px;
+  border: none; background-color: transparent; color: @gf_dim;
+}
+button.gf-newtab:hover { background-color: @gf_hover; color: @gf_text; }
+.gf-controls { margin: 0 0 6px 8px; }
+.gf-controls button { min-height: 30px; min-width: 34px; border-radius: 8px; color: @gf_dim; }
+.gf-controls button:hover { color: @gf_text; }
+.gf-controls button.close:hover { background-color: #e5485f; color: white; }
 
-/* ---- Row 2: navigation, path, search ---- */
-.gf-navbar { background-color: @gf_bar; padding: 6px 10px 4px 8px; }
-.gf-navbar > button { min-height: 32px; min-width: 32px; }
-.gf-pathbar { margin: 0 6px; }
-.gf-crumbs, .gf-pathbar > box, .gf-path-entry {
-  background-color: rgba(255, 255, 255, 0.045); border-radius: 8px; min-height: 32px;
-  border: 1px solid @gf_line; padding: 0 4px;
+/* ---- Rows 2–3: one toolbar block, joined to the selected tab ---- */
+.gf-navbar { background-color: @gf_chrome; padding: 8px 12px 4px 10px; }
+.gf-cmdbar { background-color: @gf_chrome; padding: 4px 12px 8px 10px; border-bottom: 1px solid @gf_line; }
+.gf-navbar > button { min-height: 32px; min-width: 34px; color: @gf_dim; }
+.gf-navbar > button:hover { color: @gf_text; }
+.gf-pathbar { margin: 0 8px; }
+.gf-crumbs-wrap, .gf-path-entry, .gf-search {
+  background-color: @gf_field; border-radius: 9px; min-height: 34px; border: 1px solid @gf_line;
 }
-.gf-pathbar > box > .gf-crumbs { background: none; border: none; padding: 0; }
-.gf-crumb { min-height: 26px; padding: 0 8px; border-radius: 6px; font-weight: 500; }
-.gf-crumb:last-child { color: @gf_text; }
-.gf-crumb-sep { color: @gf_dim; -gtk-icon-size: 10px; margin: 0 1px; }
-.gf-path-entry { padding: 0 10px; }
-.gf-path-entry:focus-within, .gf-search:focus-within { border-color: @gf_accent; outline: none; }
-.gf-path-entry.error { border-color: #ff4f6b; }
-.gf-search {
-  background-color: rgba(255, 255, 255, 0.045); border-radius: 8px; min-height: 32px;
-  border: 1px solid @gf_line; padding: 0 8px;
+.gf-crumbs-wrap { padding: 0 4px; }
+.gf-crumb { min-height: 26px; padding: 0 8px; border-radius: 6px; font-weight: 500; color: @gf_dim; }
+.gf-crumb:last-child { color: @gf_text; font-weight: 600; }
+.gf-crumb:hover { color: @gf_text; }
+.gf-crumb-sep { color: @gf_faint; -gtk-icon-size: 10px; margin: 0 1px; }
+.gf-path-entry { padding: 0 12px; }
+.gf-search { padding: 0 10px; }
+.gf-path-entry:focus-within, .gf-search:focus-within {
+  border-color: @gf_accent; background-color: rgba(255, 255, 255, 0.07); outline: none;
 }
+.gf-search image { color: @gf_faint; }
+.gf-path-entry.error { border-color: #e5485f; }
 
-/* ---- Row 3: commands ---- */
-.gf-cmdbar { background-color: @gf_bar; padding: 2px 10px 8px 10px; border-bottom: 1px solid @gf_line; }
-.gf-cmdbar > button, .gf-cmdbar > menubutton > button { min-height: 32px; padding: 0 10px; }
-.gf-cmdbar .gf-cmd-icon { padding: 0; min-width: 34px; }
+.gf-cmdbar > button, .gf-cmdbar > menubutton > button { min-height: 34px; padding: 0 12px; }
+.gf-cmdbar .gf-cmd-icon { padding: 0; min-width: 36px; color: rgba(239, 236, 248, 0.82); }
+.gf-cmdbar .gf-cmd-icon:hover { color: @gf_text; }
 .gf-cmdbar menubutton.gf-cmd > button { padding: 0 12px; }
-.gf-cmdbar menubutton.gf-cmd:first-child > button { background-color: @gf_accent_soft; color: @gf_text; }
-.gf-cmdbar menubutton.gf-cmd:first-child > button:hover { background-color: rgba(138, 112, 236, 0.34); }
-.gf-vsep { margin: 7px 8px; background-color: @gf_line; min-width: 1px; }
+.gf-cmdbar menubutton.gf-cmd > button label { font-weight: 500; }
+.gf-cmdbar menubutton.gf-new > button {
+  background-color: @gf_accent; color: white; padding: 0 14px 0 12px; margin-right: 4px;
+}
+.gf-cmdbar menubutton.gf-new > button:hover { background-color: #977ff2; }
+.gf-cmdbar menubutton.gf-new > button:checked { background-color: #7a60df; }
+.gf-vsep { margin: 8px 8px; background-color: @gf_line_hi; min-width: 1px; }
 
-/* ---- Sidebar ---- */
-.gf-paned > separator { background-color: @gf_line; min-width: 1px; background-image: none; }
-.gf-sidebar { background-color: @gf_window; }
-list.gf-places { background: none; padding: 8px 8px 12px 8px; }
+/* ---- Sidebar, on the glass ---- */
+.gf-paned > separator { background: none; background-image: none; min-width: 8px; border: none; box-shadow: none; }
+.gf-sidebar { background: none; }
+list.gf-places { background: none; padding: 6px 4px 12px 8px; }
 list.gf-places > row.gf-place {
-  border-radius: 8px; padding: 6px 10px; margin: 1px 0; min-height: 22px; background-color: transparent;
+  border-radius: 8px; padding: 6px 10px 6px 4px; margin: 1px 0; background-color: transparent;
+  transition: background-color 120ms;
 }
 list.gf-places > row.gf-place:hover { background-color: @gf_hover; }
 list.gf-places > row.gf-place:selected { background-color: @gf_accent_soft; color: @gf_text; }
+list.gf-places > row.gf-place image { color: rgba(185, 164, 255, 0.85); }
 list.gf-places > row.gf-place:selected image { color: @gf_lavender; }
-list.gf-places > row.gf-places-header { padding: 14px 10px 4px 10px; background: none; }
+.gf-indicator { min-width: 3px; min-height: 16px; border-radius: 3px; background-color: transparent; }
+list.gf-places > row.gf-place:selected .gf-indicator { background-color: @gf_lavender; }
+list.gf-places > row.gf-places-header { padding: 16px 12px 4px 12px; background: none; }
 list.gf-places > row.gf-places-header:first-child { padding-top: 4px; }
-list.gf-places > row.gf-places-header label { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: @gf_dim; }
-levelbar.gf-usage { margin: 2px 0 0 26px; }
+list.gf-places > row.gf-places-header label { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: @gf_faint; }
+levelbar.gf-usage { margin: 3px 0 0 39px; }
 levelbar.gf-usage trough { min-height: 4px; border-radius: 3px; background-color: rgba(255, 255, 255, 0.08); padding: 0; border: none; }
 levelbar.gf-usage block.filled { border-radius: 3px; background-color: @gf_accent; }
-levelbar.gf-usage block.full { background-color: #ff4f6b; }
+levelbar.gf-usage block.full { background-color: #e5485f; }
 levelbar.gf-usage block.empty { background: none; }
-.gf-usage-text { font-size: 11px; color: @gf_dim; margin-left: 26px; }
+.gf-usage-text { font-size: 11px; color: @gf_faint; margin-left: 39px; }
 
-/* ---- Details list ---- */
-columnview.gf-details { background-color: @gf_base; }
-columnview.gf-details > header { padding: 4px 10px 2px 10px; background: none; border-bottom: 1px solid @gf_line; }
+/* ---- The raised surface: list, details pane, status bar ---- */
+.gf-surface {
+  background-color: @gf_surface; border-radius: 12px; margin: 8px 10px 10px 0;
+  border: 1px solid @gf_line; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+}
+.gf-surface tabview, .gf-surface stack, .gf-surface scrolledwindow { background: none; }
+
+columnview.gf-details { background: none; }
+columnview.gf-details > header { padding: 6px 12px 4px 12px; background: none; border-bottom: 1px solid @gf_line; }
 columnview.gf-details > header > row > button {
-  min-height: 26px; padding: 0 10px; border-radius: 6px; font-size: 12px; font-weight: 500; color: @gf_dim;
+  min-height: 28px; padding: 0 10px; border-radius: 6px; font-size: 12px; font-weight: 600; color: @gf_faint;
   background-color: transparent;
 }
 columnview.gf-details > header > row > button:hover { background-color: @gf_hover; color: @gf_text; }
 columnview.gf-details > header > row > button sort-indicator { color: @gf_lavender; }
-columnview.gf-details > listview { padding: 4px 8px 12px 8px; background: none; }
-columnview.gf-details > listview > row {
-  border-radius: 6px; margin: 0; padding: 0; min-height: 0; background-color: transparent;
-}
-columnview.gf-details > listview > row > cell { padding: 0 10px; min-height: 27px; }
+columnview.gf-details > listview { padding: 6px 10px 14px 10px; background: none; }
+columnview.gf-details > listview > row { border-radius: 7px; margin: 0; padding: 0; min-height: 0; background-color: transparent; }
+columnview.gf-details > listview > row > cell { padding: 0 10px; min-height: 30px; }
 columnview.gf-details > listview > row.activatable:hover { background-color: @gf_hover; }
 columnview.gf-details > listview > row:selected { background-color: @gf_accent_soft; }
-columnview.gf-details > listview > row:selected:hover { background-color: rgba(138, 112, 236, 0.32); }
-columnview.gf-details > listview > row:selected .dim-label { color: rgba(238, 235, 247, 0.8); }
+columnview.gf-details > listview > row:selected:hover { background-color: @gf_accent_mid; }
+columnview.gf-details > listview > row:selected .dim-label { color: rgba(239, 236, 248, 0.82); }
+columnview.gf-details > listview > row:focus-visible { outline: 1px solid @gf_accent; outline-offset: -1px; }
 .gf-cell { font-size: 13px; }
+.gf-cell.dim-label { color: @gf_dim; opacity: 1; }
 
 /* Group headers ("Bugün", "Geçen hafta"…): our own unselectable rows */
-.gf-group { padding: 12px 0 3px 0; }
+.gf-group { padding: 14px 0 4px 0; }
 .gf-group-title { font-weight: 700; font-size: 13px; color: @gf_lavender; }
-.gf-group-count { font-size: 12px; color: @gf_dim; }
+.gf-group-count {
+  font-size: 11px; font-weight: 600; color: @gf_dim; background-color: rgba(255, 255, 255, 0.07);
+  border-radius: 9px; padding: 1px 7px;
+}
 
-/* ---- Icons view ---- */
-gridview.gf-grid { background-color: @gf_base; padding: 12px; }
-gridview.gf-grid > child { border-radius: 10px; padding: 8px 6px; margin: 2px; background-color: transparent; }
+gridview.gf-grid { background: none; padding: 14px; }
+gridview.gf-grid > child { border-radius: 10px; padding: 10px 6px 8px 6px; margin: 3px; background-color: transparent; }
 gridview.gf-grid > child:hover { background-color: @gf_hover; }
 gridview.gf-grid > child:selected { background-color: @gf_accent_soft; }
-.gf-tile { min-width: 100px; }
+.gf-tile { min-width: 104px; }
 .gf-thumb { border-radius: 6px; }
-.gf-empty { color: @gf_dim; font-size: 14px; background-color: @gf_base; }
+.gf-empty { color: @gf_faint; font-size: 14px; }
 
-/* ---- Details pane ---- */
-.gf-details-pane { background-color: @gf_window; border-left: 1px solid @gf_line; padding: 18px 16px; }
-.gf-preview, .gf-preview-icon { margin-bottom: 4px; }
-.gf-preview { border-radius: 10px; }
+.gf-details-pane { background-color: rgba(0, 0, 0, 0.12); border-left: 1px solid @gf_line; padding: 20px 18px; }
+.gf-preview { border-radius: 10px; margin-bottom: 4px; }
+.gf-preview-icon { margin: 10px 0 4px 0; }
 .gf-preview-title { font-size: 15px; font-weight: 700; }
 .gf-props { font-size: 12px; margin-top: 4px; }
 
-/* ---- Status bar ---- */
-.gf-status { background-color: @gf_window; border-top: 1px solid @gf_line; padding: 2px 8px 2px 14px; min-height: 28px; font-size: 12px; }
-.gf-status-btn { min-height: 24px; min-width: 26px; border-radius: 6px; }
+.gf-status { border-top: 1px solid @gf_line; padding: 0 6px 0 16px; min-height: 30px; font-size: 12px; color: @gf_dim; }
+.gf-status > label:first-child { color: @gf_text; }
+.gf-status-btn { min-height: 24px; min-width: 28px; border-radius: 6px; color: @gf_dim; }
 
-/* ---- Menus and dialogs, soft ---- */
+/* ---- Menus, dialogs, toasts ---- */
 popover.menu > contents, popover > contents {
-  border-radius: 12px; background-color: #201b30; border: 1px solid rgba(168, 132, 255, 0.22); padding: 6px;
+  border-radius: 12px; background-color: #221c34; border: 1px solid rgba(190, 165, 255, 0.20); padding: 6px;
 }
-popover.menu modelbutton { border-radius: 7px; min-height: 30px; padding: 0 10px; }
+popover.menu modelbutton { border-radius: 7px; min-height: 32px; padding: 0 12px; }
 popover.menu modelbutton:hover { background-color: @gf_hover; }
-popover > arrow { background-color: #201b30; border-color: rgba(168, 132, 255, 0.22); }
+popover.menu separator { margin: 4px 6px; background-color: @gf_line; }
+popover.menu label.title { color: @gf_faint; font-size: 11px; font-weight: 700; }
+popover > arrow { background-color: #221c34; border-color: rgba(190, 165, 255, 0.20); }
 window.gf-window entry { border-radius: 8px; }
-window.gf-window toast { border-radius: 10px; background-color: #241e38; border: 1px solid rgba(168, 132, 255, 0.25); }
+window.gf-window toast { border-radius: 10px; background-color: #2a2342; border: 1px solid rgba(190, 165, 255, 0.24); }
+columnview.gf-details > listview > row > cell:last-child { padding-right: 18px; }
+columnview.gf-details > header > row > button:last-child { padding-right: 18px; }

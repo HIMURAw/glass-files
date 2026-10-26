@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Dosyalar (Glass)
+Name=Dosyalar
 GenericName=Dosya yöneticisi
 Comment=Klasörlere ve dosyalara göz at
 Exec=glass-files %U
