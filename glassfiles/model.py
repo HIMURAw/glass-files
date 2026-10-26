@@ -34,7 +34,7 @@ class FileItem(GObject.Object):
         self.ctime = ct.to_unix() if ct else 0
         self.icon = info.get_icon()
         self.thumbnail = info.get_attribute_byte_string("thumbnail::path")
-        self.type_desc = "Dosya klasörü" if self.is_dir else (Gio.content_type_get_description(self.content_type) or "Dosya")
+        self.type_desc = "File folder" if self.is_dir else (Gio.content_type_get_description(self.content_type) or "File")
         self.child_count = None  # filled lazily for folders
         self.sort_key = GLib.utf8_collate_key_for_filename(self.display_name, -1)
 
@@ -52,7 +52,7 @@ def human_size(n):
         if f < 1024 or u == units[-1]:
             if u == "B":
                 return f"{int(f)} B"
-            return f"{f:.1f} {u}".replace(".", ",")
+            return f"{f:.1f} {u}"
         f /= 1024
 
 
@@ -63,8 +63,8 @@ def human_date(ts):
 
 
 # Windows Explorer's groups when sorting by date, newest first.
-DATE_GROUPS = ["Bugün", "Dün", "Bu hafta başında", "Geçen hafta", "Bu ay başında",
-               "Geçen ay", "Bu yıl başında", "Uzun zaman önce"]
+DATE_GROUPS = ["Today", "Yesterday", "Earlier this week", "Last week", "Earlier this month",
+               "Last month", "Earlier this year", "A long time ago"]
 
 
 def date_group(ts, now=None):
@@ -91,7 +91,7 @@ def date_group(ts, now=None):
     return 7
 
 
-KIND_GROUPS = ["Klasörler", "Belgeler", "Resimler", "Videolar", "Müzik", "Arşivler", "Programlar", "Diğer"]
+KIND_GROUPS = ["Folders", "Documents", "Pictures", "Videos", "Music", "Archives", "Programs", "Other"]
 
 
 def kind_group(item):

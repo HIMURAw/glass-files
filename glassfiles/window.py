@@ -74,9 +74,9 @@ class PathBar(Gtk.Stack):
                 self.crumbs.append(Gtk.Image(icon_name="go-next-symbolic", css_classes=["gf-crumb-sep"]))
             b = Gtk.Button(css_classes=["flat", "gf-crumb"])
             if part.equal(HOME):
-                b.set_child(Adw.ButtonContent(icon_name="user-home-symbolic", label="Ev"))
+                b.set_child(Adw.ButtonContent(icon_name="user-home-symbolic", label="Home"))
             elif part.get_uri() == "trash:///":
-                b.set_child(Adw.ButtonContent(icon_name="user-trash-symbolic", label="Çöp kutusu"))
+                b.set_child(Adw.ButtonContent(icon_name="user-trash-symbolic", label="Trash"))
             else:
                 b.set_label(location_name(part))
             b.connect("clicked", lambda _b, p=part: self.on_go(p))
@@ -142,29 +142,29 @@ class DetailsPane(Gtk.Box):
             self.subtitle.set_label(it.type_desc)
             rows = []
             if not it.is_dir:
-                rows.append(("Boyut", f"{human_size(it.size)} ({it.size:,} bayt)".replace(",", ".")))
-            rows += [("Değiştirme", human_date(it.mtime))]
+                rows.append(("Size", f"{human_size(it.size)} ({it.size:,} bytes)"))
+            rows += [("Modified", human_date(it.mtime))]
             if it.ctime:
-                rows.append(("Oluşturma", human_date(it.ctime)))
-            rows.append(("Konum", (it.file.get_parent().get_path() or it.file.get_parent().get_uri()) if it.file.get_parent() else ""))
+                rows.append(("Created", human_date(it.ctime)))
+            rows.append(("Location", (it.file.get_parent().get_path() or it.file.get_parent().get_uri()) if it.file.get_parent() else ""))
             self._rows(rows)
         elif len(items) > 1:
             self.image.set_from_icon_name("edit-select-all-symbolic")
-            self.title.set_label(f"{len(items)} öğe seçili")
+            self.title.set_label(f"{len(items)} items selected")
             total = sum(i.size for i in items if i.size > 0)
             dirs = sum(1 for i in items if i.is_dir)
-            self.subtitle.set_label(f"{dirs} klasör, {len(items) - dirs} dosya")
-            self._rows([("Toplam boyut", human_size(total) + (" (klasörler hariç)" if dirs else ""))])
+            self.subtitle.set_label(f"{dirs} folders, {len(items) - dirs} files")
+            self._rows([("Total size", human_size(total) + (" (folders not counted)" if dirs else ""))])
         else:
             self.image.set_from_icon_name("folder-symbolic")
             self.title.set_label(location_name(browser.location))
-            self.subtitle.set_label(f"{browser.visible_count()} öğe")
-            self._rows([("Konum", browser.location.get_path() or browser.location.get_uri())])
+            self.subtitle.set_label(f"{browser.visible_count()} items")
+            self._rows([("Location", browser.location.get_path() or browser.location.get_uri())])
 
 
 class Window(Adw.ApplicationWindow):
     def __init__(self, app, settings, location=None):
-        super().__init__(application=app, title="Dosyalar", css_classes=["gf-window"])
+        super().__init__(application=app, title="Files", css_classes=["gf-window"])
         self.settings = settings
         w, h = settings.get("size", [1180, 720])
         self.set_default_size(w, h)
@@ -183,7 +183,7 @@ class Window(Adw.ApplicationWindow):
         self.tabs.connect("close-page", self._on_close_page)
         self.tabbar = Adw.TabBar(view=self.tabs, autohide=False, expand_tabs=False, css_classes=["gf-tabbar"],
                                  hexpand=False, halign=Gtk.Align.START)
-        plus = Gtk.Button(icon_name="list-add-symbolic", tooltip_text="Yeni sekme (Ctrl+T)",
+        plus = Gtk.Button(icon_name="list-add-symbolic", tooltip_text="New tab (Ctrl+T)",
                           action_name="win.new-tab", css_classes=["flat", "gf-newtab"])
         self.tabbar.set_end_action_widget(plus)
         strip = Gtk.Box(css_classes=["gf-tabstrip"])
@@ -199,14 +199,14 @@ class Window(Adw.ApplicationWindow):
 
         # Row 2: navigation, path, search.
         nav = Gtk.Box(spacing=4, css_classes=["gf-navbar"])
-        self.back_btn = button("go-previous-symbolic", "Geri (Alt+Sol)", "win.back")
-        self.fwd_btn = button("go-next-symbolic", "İleri (Alt+Sağ)", "win.forward")
-        self.up_btn = button("go-up-symbolic", "Üst klasör (Alt+Yukarı)", "win.up")
-        for b in (self.back_btn, self.fwd_btn, self.up_btn, button("view-refresh-symbolic", "Yenile (F5)", "win.reload")):
+        self.back_btn = button("go-previous-symbolic", "Back (Alt+Left)", "win.back")
+        self.fwd_btn = button("go-next-symbolic", "Forward (Alt+Right)", "win.forward")
+        self.up_btn = button("go-up-symbolic", "Up (Alt+Up)", "win.up")
+        for b in (self.back_btn, self.fwd_btn, self.up_btn, button("view-refresh-symbolic", "Refresh (F5)", "win.reload")):
             nav.append(b)
         self.pathbar = PathBar(lambda f: self.browser.navigate(f))
         nav.append(self.pathbar)
-        self.search = Gtk.SearchEntry(placeholder_text="Bu klasörde ara", width_chars=24, css_classes=["gf-search"])
+        self.search = Gtk.SearchEntry(placeholder_text="Search this folder", width_chars=24, css_classes=["gf-search"])
         self.search.connect("search-changed", lambda e: self.browser and self.browser.set_query(e.get_text()))
         nav.append(self.search)
         view.add_top_bar(nav)
@@ -214,23 +214,23 @@ class Window(Adw.ApplicationWindow):
         # Row 3: commands, like Windows 11's command bar.
         cmd = Gtk.Box(spacing=2, css_classes=["gf-cmdbar"])
         self.new_menu = Gio.Menu()
-        new_btn = menu_button("list-add-symbolic", "Yeni", self.new_menu, "Yeni klasör ya da dosya")
+        new_btn = menu_button("list-add-symbolic", "New", self.new_menu, "New folder or file")
         new_btn.add_css_class("gf-new")
         cmd.append(new_btn)
         cmd.append(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL, css_classes=["gf-vsep"]))
-        for icon, tip, act in [("edit-cut-symbolic", "Kes (Ctrl+X)", "win.cut"),
-                               ("edit-copy-symbolic", "Kopyala (Ctrl+C)", "win.copy"),
-                               ("edit-paste-symbolic", "Yapıştır (Ctrl+V)", "win.paste"),
-                               ("document-edit-symbolic", "Yeniden adlandır (F2)", "win.rename"),
-                               ("user-trash-symbolic", "Sil (Delete)", "win.trash")]:
+        for icon, tip, act in [("edit-cut-symbolic", "Cut (Ctrl+X)", "win.cut"),
+                               ("edit-copy-symbolic", "Copy (Ctrl+C)", "win.copy"),
+                               ("edit-paste-symbolic", "Paste (Ctrl+V)", "win.paste"),
+                               ("document-edit-symbolic", "Rename (F2)", "win.rename"),
+                               ("user-trash-symbolic", "Delete (Delete)", "win.trash")]:
             cmd.append(button(icon, tip, act, css=("gf-cmd-icon",)))
         cmd.append(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL, css_classes=["gf-vsep"]))
-        cmd.append(menu_button("view-sort-descending-symbolic", "Sırala", self._sort_menu(), "Sıralama ve gruplama"))
-        cmd.append(menu_button("view-grid-symbolic", "Görünüm", self._view_menu(), "Görünüm"))
+        cmd.append(menu_button("view-sort-descending-symbolic", "Sort", self._sort_menu(), "Sort and group"))
+        cmd.append(menu_button("view-grid-symbolic", "View", self._view_menu(), "View"))
         cmd.append(Gtk.Box(hexpand=True))
-        cmd.append(button("view-dual-symbolic", "Ayrıntılar bölmesi (Alt+Shift+P)", "win.details-pane",
-                          label="Ayrıntılar"))
-        more = Gtk.MenuButton(icon_name="view-more-symbolic", menu_model=self._more_menu(), tooltip_text="Diğer",
+        cmd.append(button("view-dual-symbolic", "Details pane (Alt+Shift+P)", "win.details-pane",
+                          label="Details"))
+        more = Gtk.MenuButton(icon_name="view-more-symbolic", menu_model=self._more_menu(), tooltip_text="More",
                               css_classes=["flat"])
         cmd.append(more)
         view.add_top_bar(cmd)
@@ -253,7 +253,7 @@ class Window(Adw.ApplicationWindow):
         status.append(self.status_sel)
         status.append(Gtk.Box(hexpand=True))
         status.append(self.status_job)
-        for icon, mode, tip in (("view-list-symbolic", "details", "Ayrıntılar"), ("view-grid-symbolic", "icons", "Simgeler")):
+        for icon, mode, tip in (("view-list-symbolic", "details", "Details"), ("view-grid-symbolic", "icons", "Large icons")):
             b = Gtk.Button(icon_name=icon, tooltip_text=tip, css_classes=["flat", "gf-status-btn"],
                            action_name="win.view", action_target=GLib.Variant("s", mode))
             status.append(b)
@@ -321,7 +321,7 @@ class Window(Adw.ApplicationWindow):
             return
         self.pathbar.set_location(b.location)
         self.sidebar.highlight(b.location)
-        self.search.set_placeholder_text(f"{location_name(b.location)} içinde ara")
+        self.search.set_placeholder_text(f"Search {location_name(b.location)}")
         if self.search.get_text():
             self.search.set_text("")
         self.set_title(location_name(b.location))
@@ -349,11 +349,11 @@ class Window(Adw.ApplicationWindow):
         if not b:
             return
         n = b.visible_count()
-        self.status_count.set_label(f"{n} öğe")
+        self.status_count.set_label(f"{n} items" if n != 1 else "1 item")
         sel = b.selected_items()
         if sel:
             size = sum(i.size for i in sel if i.size > 0)
-            self.status_sel.set_label(f"{len(sel)} öğe seçili" + (f"  ·  {human_size(size)}" if size else ""))
+            self.status_sel.set_label(f"{len(sel)} selected" + (f"  ·  {human_size(size)}" if size else ""))
         else:
             self.status_sel.set_label("")
         if self.details_revealer.get_reveal_child():
@@ -364,50 +364,50 @@ class Window(Adw.ApplicationWindow):
     def _sort_menu(self):
         m = Gio.Menu()
         s = Gio.Menu()
-        for label, key in (("Ad", "name"), ("Değiştirme tarihi", "date"), ("Tür", "type"), ("Boyut", "size")):
+        for label, key in (("Name", "name"), ("Date modified", "date"), ("Type", "type"), ("Size", "size")):
             s.append(label, f"win.sort::{key}")
         m.append_section(None, s)
         d = Gio.Menu()
-        d.append("Azalan", "win.descending")
+        d.append("Descending", "win.descending")
         m.append_section(None, d)
         g = Gio.Menu()
-        for label, key in (("Gruplama yok", "none"), ("Tarihe göre grupla", "date"), ("Türe göre grupla", "kind")):
+        for label, key in (("No grouping", "none"), ("Group by date", "date"), ("Group by type", "kind")):
             g.append(label, f"win.group::{key}")
-        m.append_section("Grupla", g)
+        m.append_section("Group by", g)
         return m
 
     def _view_menu(self):
         m = Gio.Menu()
         v = Gio.Menu()
-        v.append("Ayrıntılar", "win.view::details")
-        v.append("Büyük simgeler", "win.view::icons")
+        v.append("Details", "win.view::details")
+        v.append("Large icons", "win.view::icons")
         m.append_section(None, v)
         o = Gio.Menu()
-        o.append("Ayrıntılar bölmesi", "win.details-pane")
-        o.append("Gizli öğeler", "win.toggle-hidden")
-        m.append_section("Göster", o)
+        o.append("Details pane", "win.details-pane")
+        o.append("Hidden items", "win.toggle-hidden")
+        m.append_section("Show", o)
         return m
 
     def _more_menu(self):
         m = Gio.Menu()
         a = Gio.Menu()
-        a.append("Tümünü seç", "win.select-all")
-        a.append("Yolu kopyala", "win.copy-path")
-        a.append("Terminalde aç", "win.open-terminal")
-        a.append("Yer imlerine ekle", "win.add-bookmark")
+        a.append("Select all", "win.select-all")
+        a.append("Copy path", "win.copy-path")
+        a.append("Open in Terminal", "win.open-terminal")
+        a.append("Add to bookmarks", "win.add-bookmark")
         m.append_section(None, a)
         b = Gio.Menu()
-        b.append("Yeni pencere", "app.new-window")
-        b.append("Çöp kutusunu boşalt", "win.empty-trash")
-        b.append("Özellikler", "win.properties")
+        b.append("New window", "app.new-window")
+        b.append("Empty trash", "win.empty-trash")
+        b.append("Properties", "win.properties")
         m.append_section(None, b)
         return m
 
     def _fill_new_menu(self):
         self.new_menu.remove_all()
         basic = Gio.Menu()
-        basic.append("Klasör", "win.new-folder")
-        for label, key in (("Metin belgesi", "txt"), ("Markdown belgesi", "md"), ("Boş dosya", "empty")):
+        basic.append("Folder", "win.new-folder")
+        for label, key in (("Text document", "txt"), ("Markdown document", "md"), ("Empty file", "empty")):
             basic.append(label, f"win.new-file::{key}")
         self.new_menu.append_section(None, basic)
         if TEMPLATES and os.path.isdir(TEMPLATES):
@@ -416,7 +416,7 @@ class Window(Adw.ApplicationWindow):
                 if not name.startswith("."):
                     tpl.append(os.path.splitext(name)[0], f"win.new-file::tpl:{name}")
             if tpl.get_n_items():
-                self.new_menu.append_section("Şablonlar", tpl)
+                self.new_menu.append_section("Templates", tpl)
 
     def _context_menu(self, browser, view, x, y, on_item):
         m = Gio.Menu()
@@ -424,44 +424,44 @@ class Window(Adw.ApplicationWindow):
         if on_item:
             items = browser.selected_items()
             open_s = Gio.Menu()
-            open_s.append("Aç", "win.open")
+            open_s.append("Open", "win.open")
             if len(items) == 1 and items[0].is_dir:
-                open_s.append("Yeni sekmede aç", "win.open-in-tab")
+                open_s.append("Open in new tab", "win.open-in-tab")
             elif len(items) == 1:
-                open_s.append("Birlikte aç…", "win.open-with")
+                open_s.append("Open with…", "win.open-with")
             m.append_section(None, open_s)
             edit = Gio.Menu()
             if in_trash:
-                edit.append("Geri yükle", "win.restore")
+                edit.append("Restore", "win.restore")
             else:
-                edit.append("Kes", "win.cut")
-                edit.append("Kopyala", "win.copy")
-                edit.append("Yeniden adlandır", "win.rename")
-                edit.append("Yolu kopyala", "win.copy-path")
+                edit.append("Cut", "win.cut")
+                edit.append("Copy", "win.copy")
+                edit.append("Rename", "win.rename")
+                edit.append("Copy path", "win.copy-path")
             m.append_section(None, edit)
             danger = Gio.Menu()
             if not in_trash:
-                danger.append("Çöpe at", "win.trash")
-            danger.append("Kalıcı olarak sil", "win.delete")
+                danger.append("Move to trash", "win.trash")
+            danger.append("Delete permanently", "win.delete")
             m.append_section(None, danger)
             props = Gio.Menu()
-            props.append("Özellikler", "win.properties")
+            props.append("Properties", "win.properties")
             m.append_section(None, props)
         else:
             if in_trash:
-                m.append("Çöp kutusunu boşalt", "win.empty-trash")
+                m.append("Empty trash", "win.empty-trash")
             else:
-                m.append_submenu("Yeni", self.new_menu)
+                m.append_submenu("New", self.new_menu)
                 paste = Gio.Menu()
-                paste.append("Yapıştır", "win.paste")
+                paste.append("Paste", "win.paste")
                 m.append_section(None, paste)
             view_s = Gio.Menu()
-            view_s.append_submenu("Sırala", self._sort_menu())
-            view_s.append_submenu("Görünüm", self._view_menu())
+            view_s.append_submenu("Sort", self._sort_menu())
+            view_s.append_submenu("View", self._view_menu())
             m.append_section(None, view_s)
             extra = Gio.Menu()
-            extra.append("Terminalde aç", "win.open-terminal")
-            extra.append("Özellikler", "win.properties")
+            extra.append("Open in Terminal", "win.open-terminal")
+            extra.append("Properties", "win.properties")
             m.append_section(None, extra)
         pop = Gtk.PopoverMenu(menu_model=m, has_arrow=False, halign=Gtk.Align.START)
         pop.set_parent(view)
@@ -562,7 +562,7 @@ class Window(Adw.ApplicationWindow):
     def _job_done(self, errors, ok_text=None):
         self.status_job.set_visible(False)
         if errors:
-            self.toast("Hata: " + errors[0][:160])
+            self.toast("Error: " + errors[0][:160])
         elif ok_text:
             self.toast(ok_text)
 
@@ -600,7 +600,7 @@ class Window(Adw.ApplicationWindow):
         self._ask_name(d, select_all=True)
 
     def _new_file(self, kind):
-        names = {"txt": "Yeni Metin Belgesi.txt", "md": "Yeni Belge.md", "empty": "Yeni dosya"}
+        names = {"txt": "New Text Document.txt", "md": "New Document.md", "empty": "New file"}
         template = None
         if kind.startswith("tpl:"):
             name = kind[4:]
@@ -625,11 +625,11 @@ class Window(Adw.ApplicationWindow):
 
     def _rename_file(self, f, select_all=False):
         name = f.get_basename()
-        dialog = Adw.AlertDialog(heading="Yeniden adlandır")
+        dialog = Adw.AlertDialog(heading="Rename")
         entry = Gtk.Entry(text=name, activates_default=True)
         dialog.set_extra_child(entry)
-        dialog.add_response("cancel", "Vazgeç")
-        dialog.add_response("ok", "Adlandır")
+        dialog.add_response("cancel", "Cancel")
+        dialog.add_response("ok", "Rename")
         dialog.set_response_appearance("ok", Adw.ResponseAppearance.SUGGESTED)
         dialog.set_default_response("ok")
         dialog.set_close_response("cancel")
@@ -639,7 +639,7 @@ class Window(Adw.ApplicationWindow):
             if response != "ok" or not new or new == name:
                 return
             if "/" in new:
-                self.toast("Ad “/” içeremez")
+                self.toast("A name can’t contain “/”")
                 return
             try:
                 g = ops.rename(f, new)
@@ -665,7 +665,7 @@ class Window(Adw.ApplicationWindow):
             Gdk.ContentProvider.new_for_bytes("text/uri-list", GLib.Bytes.new((uris + "\r\n").encode())),
         ])
         self.get_clipboard().set_content(provider)
-        self.toast(f"{len(files)} öğe {'kesildi' if cut else 'kopyalandı'}")
+        self.toast(f"{'Cut' if cut else 'Copied'} {len(files)} item{'s' if len(files) != 1 else ''}")
 
     def _paste(self):
         app = self.get_application()
@@ -681,7 +681,7 @@ class Window(Adw.ApplicationWindow):
             try:
                 value = c.read_value_finish(res)
             except GLib.Error:
-                self.toast("Panoda dosya yok")
+                self.toast("No files on the clipboard")
                 return
             files = value.get_files() if hasattr(value, "get_files") else list(value)
             if files:
@@ -691,9 +691,9 @@ class Window(Adw.ApplicationWindow):
     def transfer(self, files, dest, move):
         if not files:
             return
-        self._job(f"{len(files)} öğe {'taşınıyor' if move else 'kopyalanıyor'}…")
+        self._job(f"{'Moving' if move else 'Copying'} {len(files)} item{'s' if len(files) != 1 else ''}…")
         ops.transfer(files, dest, move, lambda errors: self._job_done(
-            errors, f"{len(files)} öğe {'taşındı' if move else 'kopyalandı'}"))
+            errors, f"{'Moved' if move else 'Copied'} {len(files)} item{'s' if len(files) != 1 else ''}"))
 
     def _trash(self):
         if self.browser.location.get_uri().startswith("trash:"):
@@ -702,50 +702,50 @@ class Window(Adw.ApplicationWindow):
         files = self._files()
         if not files:
             return
-        self._job("Çöpe atılıyor…")
-        ops.trash(files, lambda errors: self._job_done(errors, f"{len(files)} öğe çöpe atıldı"))
+        self._job("Moving to trash…")
+        ops.trash(files, lambda errors: self._job_done(errors, f"Moved {len(files)} item{'s' if len(files) != 1 else ''} to the trash"))
 
     def _delete(self):
         files = self._files()
         if not files:
             return
-        what = f"“{files[0].get_basename()}”" if len(files) == 1 else f"{len(files)} öğe"
-        dialog = Adw.AlertDialog(heading="Kalıcı olarak silinsin mi?",
-                                 body=f"{what} geri getirilemeyecek şekilde silinecek.")
-        dialog.add_response("cancel", "Vazgeç")
-        dialog.add_response("delete", "Kalıcı olarak sil")
+        what = f"“{files[0].get_basename()}”" if len(files) == 1 else f"{len(files)} items"
+        dialog = Adw.AlertDialog(heading="Delete permanently?",
+                                 body=f"{what} will be deleted and can’t be restored.")
+        dialog.add_response("cancel", "Cancel")
+        dialog.add_response("delete", "Delete permanently")
         dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE)
         dialog.set_close_response("cancel")
 
         def respond(_d, r):
             if r == "delete":
-                self._job("Siliniyor…")
-                ops.delete_forever(files, lambda errors: self._job_done(errors, f"{what} silindi"))
+                self._job("Deleting…")
+                ops.delete_forever(files, lambda errors: self._job_done(errors, f"Deleted {what}"))
         dialog.connect("response", respond)
         dialog.present(self)
 
     def _restore(self):
         files = self._files()
         if files:
-            ops.restore_from_trash(files, lambda errors: self._job_done(errors, f"{len(files)} öğe geri yüklendi"))
+            ops.restore_from_trash(files, lambda errors: self._job_done(errors, f"Restored {len(files)} item{'s' if len(files) != 1 else ''}"))
 
     def _empty_trash(self):
-        dialog = Adw.AlertDialog(heading="Çöp kutusu boşaltılsın mı?",
-                                 body="Çöp kutusundaki her şey kalıcı olarak silinecek.")
-        dialog.add_response("cancel", "Vazgeç")
-        dialog.add_response("empty", "Boşalt")
+        dialog = Adw.AlertDialog(heading="Empty the trash?",
+                                 body="Everything in the trash will be deleted permanently.")
+        dialog.add_response("cancel", "Cancel")
+        dialog.add_response("empty", "Empty trash")
         dialog.set_response_appearance("empty", Adw.ResponseAppearance.DESTRUCTIVE)
         dialog.set_close_response("cancel")
         dialog.connect("response", lambda _d, r: r == "empty" and (
-            self._job("Çöp kutusu boşaltılıyor…"),
-            ops.empty_trash(lambda errors: (self._job_done(errors, "Çöp kutusu boşaltıldı"), self.browser.reload()))))
+            self._job("Emptying the trash…"),
+            ops.empty_trash(lambda errors: (self._job_done(errors, "Trash emptied"), self.browser.reload()))))
         dialog.present(self)
 
     def _copy_path(self):
         files = self._files() or [self.browser.location]
         text = "\n".join(f.get_path() or f.get_uri() for f in files)
         self.get_clipboard().set(text)
-        self.toast("Yol kopyalandı")
+        self.toast("Path copied")
 
     def _add_bookmark(self):
         f = (self._files() or [self.browser.location])[0]
@@ -753,7 +753,7 @@ class Window(Adw.ApplicationWindow):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "a") as fh:
             fh.write(f.get_uri() + "\n")
-        self.toast("Yer imlerine eklendi")
+        self.toast("Added to bookmarks")
 
     def _properties(self):
         items = self.browser.selected_items()
@@ -764,12 +764,12 @@ class Window(Adw.ApplicationWindow):
             self.toast(e.message)
             return
         is_dir = info.get_file_type() == Gio.FileType.DIRECTORY
-        rows = [("Tür", "Dosya klasörü" if is_dir else Gio.content_type_get_description(info.get_content_type() or "")),
-                ("Konum", (f.get_parent().get_path() if f.get_parent() else "") or ""),
-                ("Boyut", "hesaplanıyor…" if is_dir else human_size(info.get_size())),
-                ("Değiştirme", human_date(info.get_modification_date_time().to_unix() if info.get_modification_date_time() else 0)),
-                ("Sahip", info.get_attribute_string("owner::user") or ""),
-                ("İzinler", oct(info.get_attribute_uint32("unix::mode") & 0o777)[2:] if info.has_attribute("unix::mode") else "")]
+        rows = [("Type", "File folder" if is_dir else Gio.content_type_get_description(info.get_content_type() or "")),
+                ("Location", (f.get_parent().get_path() if f.get_parent() else "") or ""),
+                ("Size", "calculating…" if is_dir else human_size(info.get_size())),
+                ("Modified", human_date(info.get_modification_date_time().to_unix() if info.get_modification_date_time() else 0)),
+                ("Owner", info.get_attribute_string("owner::user") or ""),
+                ("Permissions", oct(info.get_attribute_uint32("unix::mode") & 0o777)[2:] if info.has_attribute("unix::mode") else "")]
         body = Gtk.Grid(column_spacing=14, row_spacing=6)
         labels = {}
         for i, (k, v) in enumerate(rows):
@@ -779,11 +779,11 @@ class Window(Adw.ApplicationWindow):
             labels[k] = lab
         dialog = Adw.AlertDialog(heading=info.get_display_name())
         dialog.set_extra_child(body)
-        dialog.add_response("close", "Kapat")
+        dialog.add_response("close", "Close")
         dialog.present(self)
         if is_dir and f.get_path():
-            ops.folder_size(f, lambda r: labels["Boyut"].set_label(
-                f"{human_size(r['size'])}  ·  {r['files']} dosya, {r['dirs']} klasör"))
+            ops.folder_size(f, lambda r: labels["Size"].set_label(
+                f"{human_size(r['size'])}  ·  {r['files']} files, {r['dirs']} folders"))
 
     def _set_hidden(self, v):
         self.settings["show_hidden"] = v.get_boolean()

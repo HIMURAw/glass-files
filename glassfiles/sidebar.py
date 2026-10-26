@@ -7,13 +7,13 @@ from gi.repository import GLib, GObject, Gio, Gtk, Pango
 from .model import human_size
 
 SPECIAL = [
-    ("Ev", GLib.get_home_dir(), "user-home-symbolic"),
-    ("Masaüstü", GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DESKTOP), "user-desktop-symbolic"),
-    ("İndirilenler", GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOWNLOAD), "folder-download-symbolic"),
-    ("Belgeler", GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS), "folder-documents-symbolic"),
-    ("Resimler", GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES), "folder-pictures-symbolic"),
-    ("Müzik", GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_MUSIC), "folder-music-symbolic"),
-    ("Videolar", GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_VIDEOS), "folder-videos-symbolic"),
+    ("Home", GLib.get_home_dir(), "user-home-symbolic"),
+    ("Desktop", GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DESKTOP), "user-desktop-symbolic"),
+    ("Downloads", GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOWNLOAD), "folder-download-symbolic"),
+    ("Documents", GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS), "folder-documents-symbolic"),
+    ("Pictures", GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES), "folder-pictures-symbolic"),
+    ("Music", GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_MUSIC), "folder-music-symbolic"),
+    ("Videos", GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_VIDEOS), "folder-videos-symbolic"),
 ]
 BOOKMARKS = os.path.join(GLib.get_user_config_dir(), "gtk-3.0", "bookmarks")
 
@@ -69,7 +69,7 @@ class Sidebar(Gtk.Box):
                                css_classes=["gf-usage"])
             bar.add_offset_value("full", 0.9)
             box.append(bar)
-            box.append(Gtk.Label(label=f"{human_size(total - used)} boş / {human_size(total)}", xalign=0,
+            box.append(Gtk.Label(label=f"{human_size(total - used)} free of {human_size(total)}", xalign=0,
                                  css_classes=["gf-usage-text"]))
         row.set_child(box)
         row.set_tooltip_text(gfile.get_path() or gfile.get_uri())
@@ -88,7 +88,7 @@ class Sidebar(Gtk.Box):
     def rebuild(self):
         while (child := self.list.get_first_child()):
             self.list.remove(child)
-        self._header("Hızlı erişim")
+        self._header("Quick access")
         for title, path, icon in SPECIAL:
             if path and os.path.isdir(path):
                 self._row(title, Gio.File.new_for_path(path), icon)
@@ -107,13 +107,13 @@ class Sidebar(Gtk.Box):
         except OSError:
             pass
         if marks:
-            self._header("Yer imleri")
+            self._header("Bookmarks")
             for label, f in marks:
                 self._row(label, f, "folder-symbolic")
 
-        self._header("Bu bilgisayar")
+        self._header("This PC")
         root = Gio.File.new_for_path("/")
-        self._row("Sistem (/)", root, "drive-harddisk-system-symbolic", self._usage(root))
+        self._row("System (/)", root, "drive-harddisk-system-symbolic", self._usage(root))
         seen = {"/"}
         for mount in self.volumes.get_mounts():
             f = mount.get_root()
@@ -122,7 +122,7 @@ class Sidebar(Gtk.Box):
                 continue
             seen.add(path)
             self._row(mount.get_name(), f, mount.get_symbolic_icon(), self._usage(f))
-        self._row("Çöp kutusu", Gio.File.new_for_uri("trash:///"), "user-trash-symbolic")
+        self._row("Trash", Gio.File.new_for_uri("trash:///"), "user-trash-symbolic")
 
     def highlight(self, location):
         best = None

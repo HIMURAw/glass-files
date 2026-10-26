@@ -13,7 +13,7 @@ def unique_child(folder: Gio.File, name: str, copy_suffix=False) -> Gio.File:
         stem, ext = name, ""
     candidate = folder.get_child(name)
     if copy_suffix and candidate.query_exists(None):
-        stem = f"{stem} - Kopya"
+        stem = f"{stem} - Copy"
         candidate = folder.get_child(stem + ext)
     n = 2
     while candidate.query_exists(None):
@@ -54,7 +54,7 @@ def transfer(sources, target: Gio.File, move: bool, done):
             cmd = ["mv", "-n", "--"] if move else ["cp", "-a", "--reflink=auto", "--"]
             r = subprocess.run(cmd + [src.get_path(), dest.get_path()], capture_output=True, text=True)
             if r.returncode != 0:
-                errors.append(r.stderr.strip() or f"{name}: başarısız")
+                errors.append(r.stderr.strip() or f"{name}: failed")
     _run(work, done)
 
 
@@ -122,7 +122,7 @@ def rename(f: Gio.File, new_name: str):
     return f.set_display_name(new_name, None)
 
 
-def make_folder(parent: Gio.File, name="Yeni klasör"):
+def make_folder(parent: Gio.File, name="New folder"):
     d = unique_child(parent, name)
     d.make_directory(None)
     return d

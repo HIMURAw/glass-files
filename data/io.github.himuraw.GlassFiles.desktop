@@ -1,17 +1,17 @@
 [Desktop Entry]
 Type=Application
-Name=Dosyalar
-GenericName=Dosya yöneticisi
-Comment=Klasörlere ve dosyalara göz at
+Name=Files
+GenericName=File Manager
+Comment=Browse folders and files
 Exec=glass-files %U
 Icon=system-file-manager
 Terminal=false
 StartupNotify=true
 Categories=GTK;GNOME;Utility;Core;FileManager;
 MimeType=inode/directory;
-Keywords=dosya;klasör;folder;files;explorer;gezgin;
+Keywords=folder;files;explorer;manager;
 Actions=new-window;
 
 [Desktop Action new-window]
-Name=Yeni pencere
+Name=New Window
 Exec=glass-files

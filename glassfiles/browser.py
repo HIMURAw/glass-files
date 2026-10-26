@@ -19,13 +19,24 @@ SORT_KEYS = {
 }
 
 
+# The user's special folders by their English names, whatever the folders are called on disk.
+SPECIAL_NAMES = {GLib.get_user_special_dir(d): name for d, name in (
+    (GLib.UserDirectory.DIRECTORY_DESKTOP, "Desktop"), (GLib.UserDirectory.DIRECTORY_DOWNLOAD, "Downloads"),
+    (GLib.UserDirectory.DIRECTORY_DOCUMENTS, "Documents"), (GLib.UserDirectory.DIRECTORY_PICTURES, "Pictures"),
+    (GLib.UserDirectory.DIRECTORY_MUSIC, "Music"), (GLib.UserDirectory.DIRECTORY_VIDEOS, "Videos"),
+    (GLib.UserDirectory.DIRECTORY_TEMPLATES, "Templates"), (GLib.UserDirectory.DIRECTORY_PUBLIC_SHARE, "Public"),
+) if GLib.get_user_special_dir(d)}
+
+
 def location_name(f: Gio.File):
+    if f.get_path() in SPECIAL_NAMES:
+        return SPECIAL_NAMES[f.get_path()]
     if f.equal(HOME):
-        return "Ev"
+        return "Home"
     if f.get_uri() == "trash:///":
-        return "Çöp kutusu"
+        return "Trash"
     if f.get_path() == "/":
-        return "Sistem"
+        return "Computer"
     return f.get_basename() or f.get_uri()
 
 
@@ -73,7 +84,7 @@ class Browser(Gtk.Box):
         self.stack = Gtk.Stack(vexpand=True, hexpand=True, transition_type=Gtk.StackTransitionType.CROSSFADE)
         self._build_details()
         self._build_grid()
-        self.empty = Gtk.Label(label="Bu klasör boş", css_classes=["gf-empty"], vexpand=True)
+        self.empty = Gtk.Label(label="This folder is empty", css_classes=["gf-empty"], vexpand=True)
         self.stack.add_named(self.empty, "empty")
         self.append(self.stack)
 
@@ -233,7 +244,7 @@ class Browser(Gtk.Box):
         self.items = {}
         self.flat.remove_all()
         self.loading = True
-        self.empty.set_label("Bu klasör boş")
+        self.empty.set_label("This folder is empty")
         self._watch()
         self.location.enumerate_children_async(ATTRS, Gio.FileQueryInfoFlags.NONE, GLib.PRIORITY_DEFAULT,
                                                self._cancel, self._on_enumerate, self._cancel)
@@ -244,7 +255,7 @@ class Browser(Gtk.Box):
         except GLib.Error as e:
             if not cancel.is_cancelled():
                 self.loading = False
-                self.empty.set_label(f"Açılamadı: {e.message}")
+                self.empty.set_label(f"Can’t open: {e.message}")
                 self._sync_empty()
             return
         en.next_files_async(512, GLib.PRIORITY_DEFAULT, cancel, self._on_batch, cancel)
@@ -312,7 +323,7 @@ class Browser(Gtk.Box):
     def _sync_empty(self):
         if self.flat.get_n_items() == 0 and not self.loading:
             if self.query:
-                self.empty.set_label(f"“{self.query}” ile eşleşen öğe yok")
+                self.empty.set_label(f"No items match “{self.query}”")
             self.stack.set_visible_child_name("empty")
         else:
             self.stack.set_visible_child_name(self.view_mode)
@@ -415,14 +426,14 @@ class Browser(Gtk.Box):
             stack.set_visible_child_name("item")
         name_factory.connect("setup", name_setup)
         name_factory.connect("bind", name_bind)
-        name_col = Gtk.ColumnViewColumn(title="Ad", factory=name_factory, expand=True, resizable=True,
+        name_col = Gtk.ColumnViewColumn(title="Name", factory=name_factory, expand=True, resizable=True,
                                         sorter=Gtk.CustomSorter.new(lambda *_: Gtk.Ordering.EQUAL, None))
         self.cv.append_column(name_col)
         self.columns["name"] = name_col
 
-        text_col("date", "Değiştirme tarihi", lambda i: human_date(i.mtime), 150)
-        text_col("type", "Tür", lambda i: i.type_desc, 170)
-        text_col("size", "Boyut", lambda i: human_size(i.size), 90, xalign=1.0)
+        text_col("date", "Date modified", lambda i: human_date(i.mtime), 150)
+        text_col("type", "Type", lambda i: i.type_desc, 170)
+        text_col("size", "Size", lambda i: human_size(i.size), 90, xalign=1.0)
         self.cv.get_sorter().connect("changed", self._on_header_sort)
 
         scroll = Gtk.ScrolledWindow(child=self.cv, vexpand=True)
