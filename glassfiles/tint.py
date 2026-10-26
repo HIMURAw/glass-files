@@ -17,13 +17,19 @@ CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "tem
 BASE_HUE = 258  # the original violet
 
 # hue: degrees; sat: saturation factor (0 = greyscale); lum: lightness factor for accent colours,
-# so white text stays readable on light hues like turquoise; icon_hue: Papirus folders/apps.
+# so white text stays readable on light hues like turquoise; icon_*: the Papirus icons, which
+# need their own hue and a darker, fuller tone (cyan at violet's lightness looks washed out).
 THEMES = {
-    "turkuaz": {"hue": 183, "sat": 1.0, "lum": 0.70, "accent": "teal", "label": "Turquoise"},
-    "yesil": {"hue": 150, "sat": 0.85, "lum": 0.70, "accent": "green", "label": "Green"},
-    "mavi": {"hue": 215, "sat": 1.0, "lum": 0.90, "accent": "blue", "label": "Blue"},
-    "mor": {"hue": 258, "sat": 1.0, "lum": 1.0, "accent": "purple", "label": "Violet"},
-    "gri": {"hue": 0, "sat": 0.0, "lum": 0.85, "accent": "slate", "label": "Grey"},
+    "turkuaz": {"hue": 178, "sat": 1.0, "lum": 0.62, "accent": "teal", "label": "Turquoise",
+                "icon_hue": 176, "icon_lum": 0.68, "icon_sat": 0.08},
+    "yesil": {"hue": 150, "sat": 0.85, "lum": 0.70, "accent": "green", "label": "Green",
+              "icon_hue": 148, "icon_lum": 0.70, "icon_sat": 0.06},
+    "mavi": {"hue": 215, "sat": 1.0, "lum": 0.90, "accent": "blue", "label": "Blue",
+             "icon_hue": 216, "icon_lum": 0.82, "icon_sat": 0.04},
+    "mor": {"hue": 258, "sat": 1.0, "lum": 1.0, "accent": "purple", "label": "Violet",
+            "icon_hue": 265, "icon_lum": 1.0, "icon_sat": 0.0},
+    "gri": {"hue": 0, "sat": 0.0, "lum": 0.85, "accent": "slate", "label": "Grey",
+            "icon_hue": 0, "icon_lum": 0.9, "icon_sat": 0.0},
 }
 ALIASES = {"turquoise": "turkuaz", "green": "yesil", "yeşil": "yesil", "blue": "mavi", "purple": "mor",
            "violet": "mor", "grey": "gri", "gray": "gri", "siyah": "gri", "beyaz": "gri", "mono": "gri"}
