@@ -9,6 +9,7 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 from gi.repository import Adw, Gdk, GLib, Gio, Gtk  # noqa: E402
 
+from . import tint  # noqa: E402
 from .window import Window  # noqa: E402
 
 APP_ID = "io.github.himuraw.GlassFiles"
@@ -56,13 +57,22 @@ class App(Adw.Application):
     def do_startup(self):
         Adw.Application.do_startup(self)
         Adw.StyleManager.get_default().set_color_scheme(Adw.ColorScheme.PREFER_DARK)
-        css = Gtk.CssProvider()
-        css.load_from_path(os.environ.get("GF_CSS") or os.path.join(HERE, "style.css"))
+        self.css = Gtk.CssProvider()
+        self._load_css()
         # Above the user's gtk.css (800): the Mor theme cuts corners at 45°, the file manager is softer.
-        Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css, 900)
+        Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), self.css, 900)
+        # The colour theme (tema-rengi) changes live: style.css is violet, recoloured on load.
+        os.makedirs(tint.CONFIG.parent, exist_ok=True)
+        self._tema = Gio.File.new_for_path(str(tint.CONFIG.parent)).monitor_directory(Gio.FileMonitorFlags.NONE, None)
+        self._tema.connect("changed", lambda _m, f, *_: f.get_basename() == "current.json" and self._load_css())
         Gio.bus_own_name(Gio.BusType.SESSION, "org.freedesktop.FileManager1",
                          Gio.BusNameOwnerFlags.ALLOW_REPLACEMENT | Gio.BusNameOwnerFlags.REPLACE,
                          self._on_bus, None, None)
+
+    def _load_css(self):
+        path = os.environ.get("GF_CSS") or os.path.join(HERE, "style.css")
+        with open(path) as fh:
+            self.css.load_from_string(tint.recolor_css(fh.read()))
 
     def _on_bus(self, conn, _name):
         node = Gio.DBusNodeInfo.new_for_xml(FM1_XML)
