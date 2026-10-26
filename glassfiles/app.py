@@ -133,4 +133,7 @@ class App(Adw.Application):
 
 
 def main():
+    # No display (D-Bus activation while the session is ending): nothing to show, leave quietly.
+    if not Gtk.init_check():
+        return 0
     return App().run(sys.argv)
