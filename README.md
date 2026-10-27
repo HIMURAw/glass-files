@@ -15,3 +15,7 @@ Python + GTK 4 + libadwaita.
 - `org.freedesktop.FileManager1` on D-Bus, so "show in folder" from browsers opens it
 
 Install: `./install.sh` (add `--default` to make it the default file manager, `--undo-default` to go back).
+
+## License
+
+GPL-3.0
