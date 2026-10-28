@@ -1,0 +1,101 @@
+/* Glass Files — Glass (cam) layer, loaded after style.css only when the colour theme is round
+   (tint.current()["round"]). The Cam Panel look: neutral white frost instead of violet, pill
+   buttons/tabs/fields, 22px surface, white .16 selection, #8fb4ff accent with dark text.
+   These colours are final: this file is not run through tint.recolor_css(). */
+
+@define-color gf_glass #12151f;
+@define-color gf_chrome #171b28;
+@define-color gf_surface #1b1f2d;
+@define-color gf_surface_hi #222738;
+@define-color gf_field rgba(255, 255, 255, 0.07);
+@define-color gf_hover rgba(255, 255, 255, 0.10);
+@define-color gf_press rgba(255, 255, 255, 0.16);
+@define-color gf_line rgba(255, 255, 255, 0.10);
+@define-color gf_line_hi rgba(255, 255, 255, 0.17);
+@define-color gf_accent #8fb4ff;
+@define-color gf_accent_soft rgba(255, 255, 255, 0.16);
+@define-color gf_accent_mid rgba(255, 255, 255, 0.22);
+@define-color gf_lavender #8fb4ff;
+@define-color gf_text #f4f1ff;
+@define-color gf_dim rgba(244, 241, 255, 0.66);
+@define-color gf_faint rgba(244, 241, 255, 0.42);
+
+window.gf-window {
+  background-image: radial-gradient(circle at 0% 0%, rgba(143, 180, 255, 0.07), transparent 45%);
+}
+
+/* Pills: buttons, tabs, fields, crumbs */
+window.gf-window button, button.gf-newtab, .gf-controls button, .gf-crumb, .gf-status-btn,
+.gf-tabbar tab .tab-close-button { border-radius: 999px; }
+window.gf-window button:active, window.gf-window button:checked {
+  background-color: @gf_press; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
+.gf-controls button.close:hover { background-color: #ff8f8f; color: #2b0f14; }
+
+.gf-tabstrip { padding: 8px 8px 6px 10px; }
+.gf-tabbar tab { border-radius: 999px; margin: 0 4px 0 0; min-height: 32px; }
+.gf-tabbar tab:hover { background-color: @gf_hover; }
+.gf-tabbar tab:selected {
+  background-color: @gf_press; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
+.gf-tabbar tab:selected image { color: @gf_text; }
+button.gf-newtab { margin: 0 0 1px 4px; }
+
+/* The command block floats as a glass panel instead of joining the selected tab */
+.gf-navbar, .gf-cmdbar {
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid @gf_line_hi; margin: 0 10px;
+}
+.gf-navbar {
+  background-image: linear-gradient(160deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04) 60%);
+  border-bottom: none; border-radius: 22px 22px 0 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.gf-cmdbar { border-top: none; border-radius: 0 0 22px 22px; margin-bottom: 2px; }
+.gf-crumbs-wrap, .gf-path-entry, .gf-search { border-radius: 999px; border-color: @gf_line_hi; }
+.gf-crumbs-wrap { padding: 0 6px; }
+.gf-path-entry, .gf-search { padding: 0 14px; }
+.gf-cmdbar .gf-cmd-icon { color: @gf_dim; }
+.gf-cmdbar menubutton.gf-new > button { color: #101a33; }
+.gf-cmdbar menubutton.gf-new > button:hover { background-color: #a3c2ff; }
+.gf-cmdbar menubutton.gf-new > button:checked { background-color: #7ba3f2; }
+
+/* Sidebar: pill rows, white frost selection, no side line */
+list.gf-places > row.gf-place { border-radius: 999px; padding: 6px 12px 6px 4px; }
+list.gf-places > row.gf-place:selected { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20); }
+list.gf-places > row.gf-place image, list.gf-places > row.gf-place:selected image { color: @gf_dim; }
+list.gf-places > row.gf-place:selected image { color: @gf_text; }
+list.gf-places > row.gf-place:selected .gf-indicator { background-color: transparent; }
+levelbar.gf-usage trough, levelbar.gf-usage block.filled { border-radius: 999px; }
+levelbar.gf-usage block.full { background-color: #ff8f8f; }
+
+/* The raised surface: frosted glass card */
+.gf-surface {
+  border-radius: 22px; margin: 10px 10px 10px 0;
+  background-color: @gf_surface;
+  background-image: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02) 40%);
+  border: 1px solid @gf_line_hi;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 20px 50px -20px rgba(10, 8, 30, 0.35);
+}
+columnview.gf-details > header > row > button { border-radius: 999px; }
+columnview.gf-details > header > row > button sort-indicator { color: @gf_dim; }
+columnview.gf-details > listview > row { border-radius: 12px; }
+columnview.gf-details > listview > row:selected { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20); }
+columnview.gf-details > listview > row:focus-visible { outline: 2px solid @gf_accent; outline-offset: -2px; }
+.gf-group-title { color: @gf_text; }
+.gf-group-count { border-radius: 999px; background-color: rgba(255, 255, 255, 0.10); }
+gridview.gf-grid > child { border-radius: 14px; }
+gridview.gf-grid > child:selected { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20); }
+.gf-thumb, .gf-preview { border-radius: 14px; }
+.gf-details-pane { background-color: rgba(255, 255, 255, 0.03); }
+
+/* Menus, dialogs, toasts */
+popover.menu > contents, popover > contents {
+  border-radius: 18px; background-color: #1b1f2d;
+  background-image: linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05) 40%);
+  border: 1px solid @gf_line_hi; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+popover.menu modelbutton { border-radius: 10px; }
+popover > arrow { background-color: #1b1f2d; border-color: @gf_line_hi; }
+window.gf-window entry { border-radius: 12px; }
+window.gf-window toast { border-radius: 999px; background-color: rgba(26, 23, 48, 0.92); border-color: @gf_line_hi; }

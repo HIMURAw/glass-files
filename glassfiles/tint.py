@@ -28,7 +28,7 @@ THEMES = {
              "icon_hue": 216, "icon_lum": 0.82, "icon_sat": 0.04},
     "mor": {"hue": 258, "sat": 1.0, "lum": 1.0, "accent": "purple", "label": "Violet",
             "icon_hue": 265, "icon_lum": 1.0, "icon_sat": 0.0},
-    "cam": {"hue": 220, "sat": 0.75, "lum": 1.0, "accent": "blue", "label": "Glass",
+    "cam": {"hue": 220, "sat": 0.75, "lum": 1.0, "accent": "blue", "label": "Glass", "round": True,
             "icon_hue": 220, "icon_lum": 0.85, "icon_sat": 0.0},
     "gri": {"hue": 0, "sat": 0.0, "lum": 0.85, "accent": "slate", "label": "Grey",
             "icon_hue": 0, "icon_lum": 0.9, "icon_sat": 0.0},

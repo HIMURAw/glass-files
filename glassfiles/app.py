@@ -72,7 +72,12 @@ class App(Adw.Application):
     def _load_css(self):
         path = os.environ.get("GF_CSS") or os.path.join(HERE, "style.css")
         with open(path) as fh:
-            self.css.load_from_string(tint.recolor_css(fh.read()))
+            css = tint.recolor_css(fh.read())
+        # Glass (cam) changes shape too: rounded white frost on top, its colours already final.
+        if tint.current().get("round"):
+            with open(os.path.join(HERE, "style-cam.css")) as fh:
+                css += fh.read()
+        self.css.load_from_string(css)
 
     def _on_bus(self, conn, _name):
         node = Gio.DBusNodeInfo.new_for_xml(FM1_XML)
