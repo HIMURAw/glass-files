@@ -2,7 +2,7 @@
 
 The sources stay violet (the original Mor look). Each part runs its colours through recolor():
 colours in the violet family turn to the chosen theme's hue (or to grey); everything else (white
-text, red warnings, green status, the Harvis robot) is left alone. The JS twin is theme.js in
+text, red warnings, green status) is left alone. The JS twin is theme.js in
 each extension, and glassfiles/tint.py in Glass Files; keep the three identical.
 
 The chosen theme lives in ~/.config/tema/current.json; the extensions and Glass Files watch it.
